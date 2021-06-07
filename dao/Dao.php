@@ -3,8 +3,8 @@
 abstract class Dao {
     protected $pdo;
 
-    public funtion __construct($pdo) {
-        $this->pdo = $pdo;
+    public funtion __construct() {
+        $this->pdo = new Pdo();
     }
     /**
      * $id
