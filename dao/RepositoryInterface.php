@@ -1,3 +1,3 @@
 <?php
 getAll();
-getAllBy($array, $value);
+getAllBy($array);

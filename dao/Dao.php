@@ -8,31 +8,27 @@ abstract class Dao {
     }
     /**
      * $id
-     * $name : entité
-     * return name
+     * return entité
      */
-    abstract public retrieve($id, $name);
+    abstract public retrieve($id);
 
     /**
      * $id
-     * bool : false initialisé par défaut
      * return bool
      */
-    abstract public update($id, false);
+    abstract public update($id);
 
     /**
      * $id
-     * bool : false initialisé par défaut
      * return bool
      */
-    abstract public delete($id, false);
+    abstract public delete($id);
 
     /**
      * $array: tableau associatif
-     * $name : entité
-     * return name
+     * return entité
      */
-    abstract public create($array, $name);
+    abstract public create($array);
 
     /**
      * return toute les valeurs d'une table
@@ -43,5 +39,5 @@ abstract class Dao {
      * $array : tableau associatif
      * return valeur du tableau choisie dans le tableau où la value = une valeur déterminée
      */
-    abstract public getAllBy($array, $value);
+    abstract public getAllBy($array);
 }
