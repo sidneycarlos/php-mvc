@@ -3,29 +3,42 @@
 class Routing {
     private $config; //mapping du fichier json
     private $uri; //stockage du tableau issu de la variable globale
-    private $route;//stockage du tableau de la route clé de config
+    private $route;//stockage du tableau de la route testée
     private $controller; //controleur qui a été trouvé
     private $args; //tableau des arguments à passer au controller (éléments variable de l'URI)
     private $method; //verbe http de la requête
 
-    public function __construct() {
+    public function __construct() {//zone d'initialisation
         $this->config = json_decode(file_get_contents('./config/routing.json'), true);
+        $this->uri = explode('/',$_SERVER["REQUEST_URI"]);
+    
     }
 
     /**
      * Déclenche le mécanisme à chaque requête http
      * 
      */
-    //public execute(){}
-
+    public function execute(){
+        foreach($this->config as $key => $value) {
+            $this->route = explode("/", $key);
+            
+            if($this->isEqual()) {
+                $this->compare();
+            }
+        }
+    }
+        
 
 
     /**
      * Compare la longueur des tableaux $route et $uri 
      * @return un booléen 
      */
-    //private function isEqual(){}
-
+    private function isEqual(){
+        if (count($this->uri) == count($this->route)) {
+            return true;            
+        } 
+    }
 
 
     /**
@@ -52,7 +65,9 @@ class Routing {
      * ou stocke l'élément variable dans un array en tant
      * qu'argument à passer au contrôleur grâce à la méthode addArgument($index)
      */
-    //private function compare(){}
+    private function compare(){
+        
+    }
 
 
 
