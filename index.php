@@ -6,5 +6,7 @@ spl_autoload_register(function ($class) {
         include './models/' . $class . '.php';
     elseif (file_exists('./controllers/' . $class . '.php')):
         include './controllers/' . $class . '.php';
+    elseif (file_exists('./dao/' . $class . '.php')):
+        include './dao/' . $class . '.php';
     endif;
 });
