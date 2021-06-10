@@ -11,5 +11,8 @@ spl_autoload_register(function ($class) {
     endif;
 });
 
-$toto = new Routing;
+$toto = new Routing();
 $toto->execute();
+
+
+

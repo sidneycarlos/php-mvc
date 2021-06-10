@@ -1,80 +1,77 @@
 <?php
-
-class Routing {
-    private $config; //mapping du fichier json
-    private $uri; //stockage du tableau issu de la variable globale
-    private $route;//stockage du tableau de la route testée
-    private $controller; //controleur qui a été trouvé
-    private $args; //tableau des arguments à passer au controller (éléments variable de l'URI)
-    private $method; //verbe http de la requête
-
-    public function __construct() {//zone d'initialisation
-        $this->config = json_decode(file_get_contents('./config/routing.json'), true);
-        $this->uri = explode('/',$_SERVER["REQUEST_URI"]);
-    
+class Routing
+{
+    /**     *     * @var Array Tableau associatif representant le fichier de configuration      */    private $config;
+    /**     * Tableau representant l'URI     * @var array      */    private $uri;
+    /**     * Tableau representant la route correspondante à l'URI     * @var array     */    private $route;
+    /**     * Le controleur correspondant à la route trouvée     * @var string      */    private $controller;
+    /**     * Tableau des arguments a passer à la methode du controleur     * @var array     */    private $args;
+    /**     * chaine representant le verbe http     * @var string      */    private $method;
+    function __construct()
+    {
+        $DS = DIRECTORY_SEPARATOR;
+        $directory = explode($DS, __DIR__);
+        unset($directory[count($directory) - 1]);
+        $root = implode($DS, $directory);
+        $this->config = json_decode(file_get_contents($root . $DS . "config" . $DS . "routing.json"),            true);
+        $this->args = array();
     }
-
-    /**
-     * Déclenche le mécanisme à chaque requête http
-     * 
-     */
-    public function execute(){
-        foreach($this->config as $key => $value) {
+    /**     * Execute l'algorithme de routing     */    public function execute()
+    {
+        $uri = explode("?", $_SERVER['REQUEST_URI'])[0];
+        $this->uri = explode("/", $uri);
+        $this->method = $_SERVER['REQUEST_METHOD'];
+        foreach ($this->config as $key => $value) {
             $this->route = explode("/", $key);
-            
-            if($this->isEqual()) {
-                $this->compare();
+            $this->controller = $this->getValue($value);
+            if ($this->isEqual()) {
+                if ($this->compare()) {
+                    break;
+                }
             }
         }
     }
-        
-
-
-    /**
-     * Compare la longueur des tableaux $route et $uri 
-     * @return un booléen 
-     */
-    private function isEqual(){
-        if (count($this->uri) == count($this->route)) {
-            return true;            
-        } 
+    /**     * Compare la longueur des tableaux     */    private function isEqual()
+    {
+        if (strpos($this->uri[count($this->uri) - 1], "?") === 0) {
+            unset($this->uri[count($this->uri) - 1]);
+        }
+        return (count($this->uri) === count($this->route)) ? true : false;
     }
-
-
-    /**
-     * Récupère la valeur correspondant la valeur de la route (string ou tableau)
-     * $value 
-     * @return string correspondant au controller de la route sélectionnée
-     */
-    //private function getValue($value){}
-
-
-
-    /**
-     * Ajoute l'élément de l'URI à l'index
-     * $index 
-     * @return l'URI à l'index
-     */
-    //private function addArgument($index){}
-
-
-
-    /**
-     * Compare chaque élément des tableaux URI et Route 
-     * @return false
-     * ou stocke l'élément variable dans un array en tant
-     * qu'argument à passer au contrôleur grâce à la méthode addArgument($index)
-     */
-    private function compare(){
-        
+    /**     * Retourne la clé (le controleur) dans le tableau des routes     */    private function getValue($value)
+    {
+        if (is_array($value)) {
+            return (isset($value[$this->method])) ? $value[$this->method] : null;
+        } else {
+            return $value;
+        }
     }
-
-
-
-    /**
-     * utilise les propriété controller et arg une fois que la route a été trouvée
-     * @return
-     */
-    //private function invoke(){}
-
+    /**     * Ajoute l'element variable de l'URI dans la liste des arguments     */    private function addArgument($i)
+    {
+        if (!empty($this->route[$i])) {
+            $pos = strpos("(:)", $this->route[$i]);
+            if ($pos === 0) {
+                array_push($this->args, $this->uri[$i]);
+                return true;
+            }
+        }
+        return false;
+    }
+    /**     * Effectue la comparaison des elements      * entre l'URI et la route     */    private function compare()
+    {
+        for ($index = 0; $index < count($this->route); $index++) {
+            if ($this->route[$index] !== $this->uri[$index]) {
+                if (!$this->addArgument($index)) {
+                    return false;
+                }
+            }
+        }
+        $this->invoke();
+    }
+    /**     * Invoque la methode selectionnée     */    private function invoke()
+    {
+        $elements = explode(":", $this->controller);
+        $object = new $elements[0]();
+        return call_user_func_array(array($object, $elements[1]), $this->args);
+    }
 }
