@@ -27,8 +27,13 @@ abstract class Controller {
     protected final function inputPost(){
         return $this->post;
     }
-    protected function render(string $viewPath, array $data) {
 
+    protected function render(string $viewPath, array $datas = array()) {
+        foreach($datas as $key => $value) {
+            $$key = $value;
+        }
+
+        include ("./views/" . $viewPath . ".php");
     }
 
 }
