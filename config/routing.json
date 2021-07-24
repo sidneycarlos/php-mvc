@@ -1,5 +1,6 @@
 { 
     "/": "ViewController:getHome",
+    "/project-list": "ProjectsController:getProjects",
     "/les_cartes":"ViewController:getCartes",
     "/api/users":{
         "GET":"DAOUser:getAll",
